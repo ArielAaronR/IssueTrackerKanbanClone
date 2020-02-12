@@ -1,0 +1,93 @@
+@model TicketViewModel
+
+
+
+<nav class="nav-extended ">
+    <div class="nav-wrapper">
+        <a class="brand-logo" asp-area="" asp-controller="Home" asp-action="Dashboard">IssueTracker</a>
+         <ul id="nav-mobile" class="right hide-on-med-and-down">
+                @*<li class="tab">
+                    <a asp-area="" asp-controller="Home" asp-action="TicketSearch">Search</a>
+                </li>*@
+                <li class="tab">
+                    <a asp-area="" asp-controller="Home" asp-action="Logout">Log Out</a>
+                </li>
+            </ul>
+    </div>
+       
+</nav>
+<div >
+    <div class="card">
+        <h4 class="card-title center-align ">New Ticket</h4>
+        <form class="card-content" asp-action="CreateTicket" asp-controller="home" method="Post">
+            <div>
+
+                <div>
+                    <label asp-for="@Model.Ticket.Title">Issue Title</label>
+                    <span class=" red-text text-darken-2" asp-validation-for="@Model.Ticket.Title" ></span>
+                    <input type="text" class="form-control" asp-for="@Model.Ticket.Title">
+                </div>
+                    
+                <div>
+                    <label asp-for="@Model.Ticket.Description">Issue Description</label>
+                    <span class=" red-text text-darken-2" asp-validation-for="@Model.Ticket.Description" ></span>
+                    <input type="text" class="form-control" asp-for="@Model.Ticket.Description">
+                </div>
+                    
+                <div>
+                    <label asp-for="@Model.Ticket.Priority">Priority</label>
+                    <span class=" red-text text-darken-2" asp-validation-for="@Model.Ticket.Priority" ></span>
+                    <select class="browser-default" asp-for="@Model.Ticket.Priority">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label asp-for="@Model.Ticket.Deadline">Deadline</label>
+                    <span class=" red-text text-darken-2" asp-validation-for="@Model.Ticket.Deadline" ></span>
+                    <input type="date" class="form-control" asp-for="@Model.Ticket.Deadline">
+                </div>
+
+                <div>
+                    <label asp-for="@Model.Ticket.Status">Issue Status</label>
+                    <span class=" red-text text-darken-2" asp-validation-for="@Model.Ticket.Status" ></span>
+                
+                        <select class="browser-default"asp-for="@Model.Ticket.Status">
+                            <option value="To Do">To Do</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="For Review">For Review</option>
+                            <option value="Resolved">Resolved</option>
+                        </select>
+              
+                </div>
+
+                <div>
+                    <label asp-for="@Model.Ticket.UserId">Assign to: </label>
+                    <span class=" red-text text-darken-2" asp-validation-for="@Model.Ticket.UserId" ></span>
+                    
+                        <select class="browser-default" asp-for="@Model.Ticket.UserId">
+                            @foreach( var user in Model.Users)
+                            {
+                                <option value="@user.UserId"> @user.FirstName @user.LastName</option>
+                            }
+                        </select>
+
+                </div>
+
+
+            </div>
+            <button class="col s6 waves-effect waves-light  red lighten-1 btn" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+ <script src="~/lib/jquery/dist/jquery.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('select');
+    var instances = M.FormSelect.init(elems, options);
+  });
+
+</script>

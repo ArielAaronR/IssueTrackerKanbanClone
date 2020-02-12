@@ -1,0 +1,306 @@
+  
+@model TicketViewModel
+
+
+
+
+
+<nav class="nav-extended ">
+    <div class="nav-wrapper">
+        <a class="brand-logo" asp-area="" asp-controller="Home" asp-action="Dashboard">IssueTracker</a>
+         <ul id="nav-mobile" class="right hide-on-med-and-down">
+                @if( @ViewBag.User.UserPrivilage < 2){
+                <li class="tab">
+                    <a asp-area="" asp-controller="Home" asp-action="NewTicket">Create Ticket</a>
+                </li>
+                    }
+                @*<li class="tab">
+                    <a asp-area="" asp-controller="Home" asp-action="TicketSearch">Search</a>
+                </li>
+                *@
+                <li class="tab">
+                    <a asp-area="" asp-controller="Home" asp-action="Logout">Log Out</a>
+                </li>
+            </ul>
+    </div>
+       
+</nav>
+
+<div class="row">
+    <h3>@ViewBag.User.FirstName's Dashboard</h3>
+    <div class="col s3" id="todo">
+        @{var todo = Model.Tickets.Where(ticket => ticket.Status == "To Do").ToList();}
+        <div class=" center-align ">
+        <h5 class="card-title">To Do (@todo.Count)</h5>
+
+        </div>
+        <div class="divider"></div>
+
+        @foreach( var ticket in Model.Tickets)
+        {
+            @if(ticket.Status == "To Do")
+            {
+                <div class="card z-depth-3">
+                    <div>
+                        <div class=" red lighten-2 white-text center-align">
+                            <p class="card-title " > @ticket.Title</p>
+                        </div>
+                        <div class=" card-content center-align ">
+                            <p >Priority: @ticket.Priority </p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+                            <a class="col s12 waves-effect waves-light  red lighten-1 btn modal-trigger" href="#@ticket.TicketId">View</a>
+
+                        </div>
+                    </div>
+                    <div id="@ticket.TicketId" class="modal">
+                        <div class="modal-content center-align">
+                            <p class="card-title">Ticket #@ticket.TicketId</p>
+                            <p>Issue: @ticket.Title</p>
+                            <p>Description: @ticket.Description</p>
+                            <p>Priority: @ticket.Priority </p>
+                            <p>Current Status: @ticket.Status</p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+                            <p>Deadline: @ticket.Deadline</p>
+                            @if(ticket.AssignedUser.UserId == @ViewBag.User.UserId &&  ticket.AssignedUser.UserId != ticket.Creator.UserId)
+                            {
+                                <form asp-action="EditTicketProcess" asp-controller="Home" asp-route-id="@ticket.TicketId" method="Post">
+                                    <select class=" col s6 browser-default" asp-for="@Model.Ticket.Status">
+                                        <option value="" disabled selected>Update Status of Ticket</option>
+                                        <option value="To Do">To Do</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="For Review">For Review</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                    <button class="col s6 waves-effect waves-light  red lighten-1 btn modal-trigger">Submit</button>
+                                </form>
+                            }
+                            @if(ticket.Creator.UserId == @ViewBag.User.UserId)
+                            {   
+                                <div class="row ">
+                                    <a class=" col s4 waves-effect waves-light  red lighten-1 btn modal-trigger" href="/ticket/@ticket.TicketId/edit"> Edit Ticket</a>
+                                    <form asp-action="DeleteTicket" asp-controller="Home" asp-route-id="@ticket.TicketId" method='Post'>
+                                        <button class=" col s4 offset-s4 waves-effect waves-light  red lighten-1 btn modal-trigger" >Delete</button>
+                                    </form>
+
+
+                                </div>
+                            }
+                        
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+    <div class="col s3" id="progress">
+        @{var progress = Model.Tickets.Where(t => t.Status == "In Progress").ToList();}
+        <div class=" center-align ">
+            <h5>In Progress (@progress.Count)</h5>
+
+        </div>
+        <div class="divider"></div>
+        @foreach( var ticket in Model.Tickets)
+        {
+            @if( ticket.Status == "In Progress")
+            {
+             <div class="card z-depth-3">
+                    <div>
+                        <div class=" red lighten-2 white-text center-align">
+                            <p class="card-title " > @ticket.Title</p>
+                        </div>
+                        <div class=" card-content center-align ">
+                            <p >Priority: @ticket.Priority </p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+
+                            <a class="col s12 waves-effect waves-light  red lighten-1 btn modal-trigger" href="#@ticket.TicketId">View</a>
+
+                        </div>
+                    </div>
+                    <div id="@ticket.TicketId" class="modal">
+                        <div class="modal-content center-align">
+                            <p class="card-title">Ticket #@ticket.TicketId</p>
+                            <p>Issue: @ticket.Title</p>
+                            <p>Description: @ticket.Description</p>
+                            <p>Priority: @ticket.Priority </p>
+                            <p>Current Status: @ticket.Status</p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+                            <p>Deadline: @ticket.Deadline</p>
+                            @if(ticket.AssignedUser.UserId == @ViewBag.User.UserId &&  ticket.AssignedUser.UserId != ticket.Creator.UserId)
+                            {
+                                <form class="col s6" asp-action="EditTicketProcess" asp-controller="Home" asp-route-id="@ticket.TicketId" method="Post">
+                                    <select class=" browser-default" asp-for="@Model.Ticket.Status">
+                                        <option value="" disabled selected>Update Status of Ticket</option>
+                                        <option value="To Do">To Do</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="For Review">For Review</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                    <button class="col s6 waves-effect waves-light  red lighten-1 btn modal-trigger">Submit</button>
+                                </form>
+                            }
+                            @if(ticket.Creator.UserId == @ViewBag.User.UserId)
+                            {   
+                                <div class="row ">
+                                    <a class=" col s4 waves-effect waves-light  red lighten-1 btn modal-trigger" href="/ticket/@ticket.TicketId/edit"> Edit Ticket</a>
+                                    <form asp-action="DeleteTicket" asp-controller="Home" asp-route-id="@ticket.TicketId" method='Post'>
+                                        <button class=" col s4 offset-s4 waves-effect waves-light  red lighten-1 btn modal-trigger" >Delete</button>
+                                    </form>
+
+
+                                </div>
+                            }
+                        
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
+
+    <div class="col s3" id="Review">
+        @{var review = Model.Tickets.Where(t => t.Status == "For Review").ToList();}
+        <div class=" center-align ">
+            <h5 class="heading">For Review (@review.Count)</h5>
+
+        </div>
+        <div class="divider"></div>
+        @foreach( var ticket in Model.Tickets)
+        {
+            @if( ticket.Status == "For Review")
+            {
+                <div class="card z-depth-3">
+                    <div>
+                        <div class=" red lighten-2 white-text center-align">
+                            <p class="card-title " > @ticket.Title</p>
+                        </div>
+                        <div class=" card-content center-align ">
+                            <p >Priority: @ticket.Priority </p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+
+                            <a class="col s12 waves-effect waves-light  red lighten-1 btn modal-trigger" href="#@ticket.TicketId">View</a>
+
+                        </div>
+                    </div>
+                    <div id="@ticket.TicketId" class="modal">
+                        <div class="modal-content center-align">
+                            <p class="card-title">Ticket #@ticket.TicketId</p>
+                            <p>Issue: @ticket.Title</p>
+                            <p>Description: @ticket.Description</p>
+                            <p>Priority: @ticket.Priority </p>
+                            <p>Current Status: @ticket.Status</p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+                            <p>Deadline: @ticket.Deadline</p>
+                            @if(ticket.AssignedUser.UserId == @ViewBag.User.UserId &&  ticket.AssignedUser.UserId != ticket.Creator.UserId)
+                            {
+                                <form asp-action="EditTicketProcess" asp-controller="Home" asp-route-id="@ticket.TicketId" method="Post">
+                                    <select class=" col s6 browser-default" asp-for="@Model.Ticket.Status">
+                                        <option value="" disabled selected>Update Status of Ticket</option>
+                                        <option value="To Do">To Do</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="For Review">For Review</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                    <button class="col s6 waves-effect waves-light  red lighten-1 btn modal-trigger">Submit</button>
+                                </form>
+                            }
+                            @if(ticket.Creator.UserId == @ViewBag.User.UserId)
+                            {   
+                                <div class="row ">
+                                    <a class=" col s4 waves-effect waves-light  red lighten-1 btn modal-trigger" href="/ticket/@ticket.TicketId/edit"> Edit Ticket</a>
+                                    <form asp-action="DeleteTicket" asp-controller="Home" asp-route-id="@ticket.TicketId" method='Post'>
+                                        <button class=" col s4 offset-s4 waves-effect waves-light  red lighten-1 btn modal-trigger" >Delete</button>
+                                    </form>
+
+
+                                </div>
+                            }
+                        
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
+
+    <div class="col s3 " id="Resolved">
+        @{var resolved = Model.Tickets.Where(t => t.Status == "Resolved").ToList();}
+        <div class=" center-align ">
+            <h5 class="card-title">Resolved (@resolved.Count)</h5>
+        </div>
+        <div class="divider"></div>
+        @foreach( var ticket in Model.Tickets)
+        {
+            @if( ticket.Status == "Resolved")
+            {
+                  <div class="card z-depth-3">
+                    <div>
+                        <div class=" red lighten-2 white-text center-align">
+                            <p class="card-title " > @ticket.Title</p>
+                        </div>
+                        <div class=" card-content center-align ">
+                            <p >Priority: @ticket.Priority </p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+
+                            <a class="col s12 waves-effect waves-light  red lighten-1 btn modal-trigger" href="#@ticket.TicketId">View</a>
+
+                        </div>
+                    </div>
+                    <div id="@ticket.TicketId" class="modal">
+                        <div class="modal-content center-align">
+                            <p class="card-title">Ticket #@ticket.TicketId</p>
+                            <p>Issue: @ticket.Title</p>
+                            <p>Description: @ticket.Description</p>
+                            <p>Priority: @ticket.Priority </p>
+                            <p>Current Status: @ticket.Status</p>
+                            <p>Assigned To: @ticket.AssignedUser.FirstName @ticket.AssignedUser.LastName</p>
+                            <p>Deadline: @ticket.Deadline</p>
+                            @if(ticket.AssignedUser.UserId == @ViewBag.User.UserId &&  ticket.AssignedUser.UserId != ticket.Creator.UserId)
+                            {
+                                <form asp-action="EditTicketProcess" asp-controller="Home" asp-route-id="@ticket.TicketId" method="Post">
+                                    <select  class="col s6 browser-default" asp-for="@Model.Ticket.Status">
+                                    <option value="" disabled selected>Update Status of Ticket</option>
+                                    <option value="To Do">To Do</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="For Review">For Review</option>
+                                    <option value="Resolved">Resolved</option>
+                                    </select>
+                                    <button class="col s6 waves-effect waves-light  red lighten-1 btn modal-trigger">Submit</button>
+                                </form>
+                            }
+                            @if(ticket.Creator.UserId == @ViewBag.User.UserId)
+                            {   
+                                <div class="row ">
+                                    <a class=" col s4 waves-effect waves-light  red lighten-1 btn modal-trigger" href="/ticket/@ticket.TicketId/edit"> Edit Ticket</a>
+                                    <form asp-action="DeleteTicket" asp-controller="Home" asp-route-id="@ticket.TicketId" method='Post'>
+                                        <button class=" col s4 offset-s4 waves-effect waves-light  red lighten-1 btn modal-trigger" >Delete</button>
+                                    </form>
+
+
+                                </div>
+                            }
+                        
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+    </div>
+
+</div>
+</div>
+    
+   <script src="~/lib/jquery/dist/jquery.js"></script>
+   <script>
+
+  $(document).ready(function(){
+    $('.modal').modal();
+  });
+   </script>
+
+

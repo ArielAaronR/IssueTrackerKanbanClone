@@ -1,0 +1,28 @@
+@model LoginUser
+<div class="container">
+    <div class="row">
+        <div class="card col s12 m10 l12 offset-m1" >
+            <div class="card-content">
+                <span class="card-title">Login</span>
+                <form asp-controller="Home" asp-action="LoginUser" method = "Post">
+                    <div>
+                        <label for="LoginEmail">Email</label>
+                        <span  asp-validation-for="LoginEmail"></span>
+                        <input type="text" class="form-control" asp-for="LoginEmail" value="bob@gmail.com">
+                    </div>
+                    <div>
+                        <label for="LoginPassword">Password</label>
+                        <span  asp-validation-for="LoginPassword"></span>
+                        <input type="password" class="form-control" asp-for="LoginPassword" value="Password123">
+                    </div>
+                    <button class="btn waves-effect waves-light  red lighten-1 " type="submit">Log In</button>
+                </form>
+            </div>
+            
+        </div>
+        <div class="row">
+            <a class="waves-effect waves-light  red lighten-1  btn btn-primary col s10 offset-m1" href="/">Need to Sign Up? </a>
+        </div>
+    </div>
+</div>
+

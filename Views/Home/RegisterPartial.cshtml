@@ -1,0 +1,42 @@
+@model User
+
+<div>
+    <form asp-controller="Home" asp-action="register" method="Post">
+        <div class="card">
+            <div class="card-content">
+            <span class="card-title">Register as a Developer</span>
+
+                    <div >
+                        <label for="FirstName" >First Name</label>
+                        <span class="text-danger font-weight-bold" asp-validation-for="FirstName"></span>
+                        <input type="text" asp-for="FirstName">
+                
+                    </div>
+                    <div>
+                        <label for="LastName">Last Name</label>
+                        <span class="text-danger font-weight-bold" asp-validation-for="LastName"></span>
+                        <input type="text"  asp-for="LastName">
+                    </div>
+                    <div>
+                        <label for="Email">Email</label>
+                        <span class="text-danger font-weight-bold" asp-validation-for="Email"></span>
+                        <input type="text"  asp-for="Email">
+                    </div>
+
+                <div>
+                    <label for="Password">Password</label>
+                    <span class="text-danger font-weight-bold" asp-validation-for="Password"></span>
+                    <input type="password"  asp-for="Password">
+                </div>
+                <div>
+                    <label for="Confirm">Confirm Password</label>
+                    <span class="text-danger font-weight-bold" asp-validation-for="Confirm"></span>
+                    <input type="password" class="form-control" asp-for="Confirm">
+                </div>
+                <button class="btn waves-effect waves-light  red lighten-1 " type="submit">Sign Up Now</button>
+
+
+            </div>
+        </div>
+    </form>
+</div>
