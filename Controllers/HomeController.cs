@@ -199,6 +199,9 @@ namespace IssueTracker.Controllers
             .Include(ticket => ticket.Comments)
             .FirstOrDefault(ticket => ticket.TicketId == ticketId);
             List<User> allUsers = dbContext.Users.ToList();
+            User loggedUser = dbContext.Users.FirstOrDefault(u => u.UserId == _uid);
+
+            ViewBag.User = loggedUser;
             return View(new TicketViewModel { Ticket = thisTicket, Users = allUsers });
         }
 
@@ -219,7 +222,7 @@ namespace IssueTracker.Controllers
             return View(allTickets);
         }
 
-        [HttpPost("tickets/{id}/comments/new")]
+        [HttpPost("dashboard/tickets/{id}/comments/new")]
         public IActionResult AddComment(int id, TicketViewModel TicketComment)
         {
             Ticket queryTicket = dbContext.Tickets.OrderByDescending(t => t.CreatedAt).Include(t => t.AssignedUser).Include(t => t.Creator).Include(t => t.Comments).FirstOrDefault(t => t.TicketId == id);
@@ -232,29 +235,26 @@ namespace IssueTracker.Controllers
             if (TicketComment.Comment.Description == null)
             {
                 ModelState.AddModelError("Comment.Content", "Message content field cannot be empty.");
-                return View("TicketDetails", new TicketViewModel { Ticket = queryTicket, Users = allUsers });
+                return View("OneTicketDetails", new TicketViewModel { Ticket = queryTicket, Users = allUsers });
             }
+
             if (ModelState.IsValid)
             {
-                if (TicketComment.Comment.Description.Length > 5)
-                {
-                    Ticket thisTicket = dbContext.Tickets.FirstOrDefault(t => t.TicketId == id);
-                    User thisUser = dbContext.Users.FirstOrDefault(user => user.UserId == _uid);
-                    Comment newComment = new Comment();
-                    newComment.Description = TicketComment.Comment.Description;
-                    newComment.UserId = thisUser.UserId;
-                    newComment.TicketId = thisTicket.TicketId;
-                    newComment.CommentedFromUser = thisUser;
-                    newComment.CommentedTicket = thisTicket;
-                    dbContext.Add(newComment);
-                    dbContext.SaveChanges();
-                    return RedirectToAction("OneTicketDetails", new { id = newId });
-                }
-                else
-                {
-                    ModelState.AddModelError("Comment.Description", "Message must be at least 5 characters (250 max)");
-                    return View("TicketDetails", new TicketViewModel { Ticket = queryTicket, Users = allUsers });
-                }
+
+                Ticket thisTicket = dbContext.Tickets.FirstOrDefault(t => t.TicketId == id);
+                User thisUser = dbContext.Users.FirstOrDefault(user => user.UserId == _uid);
+                Comment newComment = new Comment();
+                newComment.Description = TicketComment.Comment.Description;
+                newComment.UserId = thisUser.UserId;
+                newComment.TicketId = thisTicket.TicketId;
+                newComment.CommentedFromUser = thisUser;
+                newComment.CommentedTicket = thisTicket;
+                dbContext.Add(newComment);
+                dbContext.SaveChanges();
+
+
+                return RedirectToAction("Dashboard");
+
             }
             else
             {
@@ -413,12 +413,12 @@ namespace IssueTracker.Controllers
                     ModelState.AddModelError("Ticket.Deadline", "Deadline must be set to a future date.");
                     Ticket thisTicket = dbContext.Tickets.Include(ticket => ticket.AssignedUser).FirstOrDefault(ticket => ticket.TicketId == id);
                     List<User> allUsers = dbContext.Users.ToList();
-                    return View("EditTicket", new TicketViewModel { Ticket = thisTicket, Users = allUsers });
+                    return RedirectToAction("EditTicket", new TicketViewModel { Ticket = thisTicket, Users = allUsers });
                 }
             }
             Ticket thiseditTicket = dbContext.Tickets.Include(ticket => ticket.AssignedUser).FirstOrDefault(ticket => ticket.TicketId == id);
             List<User> alleditUsers = dbContext.Users.ToList();
-            return View("EditTicket", new TicketViewModel { Ticket = thiseditTicket, Users = alleditUsers });
+            return RedirectToAction("EditTicket", new TicketViewModel { Ticket = thiseditTicket, Users = alleditUsers });
         }
 
 
